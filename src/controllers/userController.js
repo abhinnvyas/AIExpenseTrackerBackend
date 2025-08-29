@@ -1,4 +1,7 @@
 import prisma from "../prisma.js";
+import { getJwtToken } from "../utils/getJwtToken.js";
+import { generateHash } from "../utils/hashPassword.js";
+import bcrypt from "bcrypt";
 
 // Create user
 export const createUser = async (req, res) => {
@@ -8,12 +11,13 @@ export const createUser = async (req, res) => {
         .status(400)
         .json({ status: false, message: "Missing request body" });
     }
-    const { name, monthlyBudget } = req.body;
-    if (!name || !monthlyBudget) {
+    const { name, email, password, monthlyBudget } = req.body;
+    if (!name || !monthlyBudget || !password || !email) {
       return res
         .status(400)
         .json({ status: false, message: "Missing required fields" });
     }
+
     if (typeof monthlyBudget !== "number" || isNaN(monthlyBudget)) {
       return res
         .status(400)
@@ -21,7 +25,7 @@ export const createUser = async (req, res) => {
     }
 
     const existingUser = await prisma.user.findFirst({
-      where: { name },
+      where: { name, email },
     });
 
     if (existingUser) {
@@ -30,13 +34,15 @@ export const createUser = async (req, res) => {
         .json({ status: false, message: "User with this name already exists" });
     }
 
+    const passwordHash = await generateHash(password);
+
     const user = await prisma.user.create({
-      data: { name, monthlyBudget },
+      data: { name, email, password: passwordHash, monthlyBudget },
     });
 
     res.status(201).json({
       status: true,
-      message: "User created successfully",
+      message: "User created successfully please login",
       data: user,
     });
   } catch (err) {
@@ -45,6 +51,59 @@ export const createUser = async (req, res) => {
   }
 };
 
+export const loginUser = async (req, res) => {
+  try {
+    if (!req.body) {
+      return res
+        .status(400)
+        .json({ status: false, message: "Missing request body" });
+    }
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res
+        .status(400)
+        .json({ status: false, message: "Missing required fields" });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      return res
+        .status(400)
+        .json({ status: false, message: "No user exists with this email" });
+    }
+
+    const isPasswordMatch = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordMatch) {
+      return res
+        .status(400)
+        .json({ status: false, message: "Incorrect password" });
+    }
+
+    const token = getJwtToken(user.id);
+
+    res.status(200).json({
+      status: true,
+      message: "User logged in successfully",
+      data: {
+        user: {
+          name: user.name,
+          email: user.email,
+          monthlyBudget: user.monthlyBudget,
+          currency: user.currency,
+          createdAt: user.createdAt,
+        },
+        token,
+      },
+    });
+  } catch (err) {
+    console.error("Error at controllers/userController.js -> loginUser:", err);
+    res.status(500).json({ status: false, message: "Internal server error" });
+  }
+};
 // Get all users
 export const getUsers = async (req, res) => {
   try {

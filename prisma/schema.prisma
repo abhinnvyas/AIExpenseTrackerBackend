@@ -17,6 +17,8 @@ datasource db {
 model User {
 id String @id @default(uuid())
 name String?
+email String? @unique
+password String
 monthlyBudget Int @default(0)
 currency String @default("INR")
 createdAt DateTime @default(now())
