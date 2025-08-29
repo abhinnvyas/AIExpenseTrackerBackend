@@ -10,8 +10,8 @@ export const createExpense = async (req, res) => {
         .status(400)
         .json({ status: false, message: "Missing request body" });
     }
-
-    const { userId, description } = req.body;
+    const userId = req.userId;
+    const { description } = req.body;
 
     if (!userId || !description) {
       return res
@@ -68,12 +68,8 @@ export const createExpense = async (req, res) => {
 
 export const getExpenses = async (req, res) => {
   try {
-    if (!req.params || !req.params.userId) {
-      return res
-        .status(400)
-        .json({ status: false, message: "Missing Request Parameters" });
-    }
-    const { userId } = req.params;
+    // const { userId } = req.params;
+    const userId = req.userId;
 
     if (!userId) {
       return res

@@ -43,7 +43,15 @@ export const createUser = async (req, res) => {
     res.status(201).json({
       status: true,
       message: "User created successfully please login",
-      data: user,
+      data: {
+        user: {
+          name: user.name,
+          email: user.email,
+          monthlyBudget: user.monthlyBudget,
+          currency: user.currency,
+          createdAt: user.createdAt,
+        },
+      },
     });
   } catch (err) {
     console.error("Error at controllers/userController.js -> createUser:", err);
@@ -124,12 +132,9 @@ export const getUsers = async (req, res) => {
 
 export const getUserById = async (req, res) => {
   try {
-    if (!req.params || !req.params.userId) {
-      return res
-        .status(400)
-        .json({ status: false, message: "Missing Request Parameters" });
-    }
-    const { userId } = req.params;
+    // const { userId } = req.params;
+    const userId = req.userId;
+    console.log("User ID from token:", userId);
     if (!userId) {
       return res
         .status(400)
@@ -144,7 +149,15 @@ export const getUserById = async (req, res) => {
     res.status(200).json({
       status: true,
       message: "User fetched successfully",
-      data: user,
+      data: {
+        user: {
+          name: user.name,
+          email: user.email,
+          monthlyBudget: user.monthlyBudget,
+          currency: user.currency,
+          createdAt: user.createdAt,
+        },
+      },
     });
   } catch (err) {
     console.error(
@@ -157,12 +170,9 @@ export const getUserById = async (req, res) => {
 
 export const getUserBudget = async (req, res) => {
   try {
-    if (!req.params || !req.params.userId) {
-      return res
-        .status(400)
-        .json({ status: false, message: "Missing Request Parameters" });
-    }
-    const { userId } = req.params;
+    // const { userId } = req.params;
+    const userId = req.userId;
+
     if (!userId) {
       return res
         .status(400)
@@ -191,12 +201,8 @@ export const getUserBudget = async (req, res) => {
 
 export const getAvailableBalance = async (req, res) => {
   try {
-    if (!req.params || !req.params.userId) {
-      return res
-        .status(400)
-        .json({ status: false, message: "Missing Request Parameters" });
-    }
-    const { userId } = req.params;
+    // const { userId } = req.params;
+    const userId = req.userId;
 
     if (!userId) {
       return res
@@ -245,12 +251,7 @@ export const getAvailableBalance = async (req, res) => {
 
 export const deleteUser = async (req, res) => {
   try {
-    if (!req.params || !req.params.userId) {
-      return res
-        .status(400)
-        .json({ status: false, message: "Missing Request Parameters" });
-    }
-    const { userId } = req.params;
+    const userId = req.userId;
 
     if (!userId) {
       return res
@@ -291,12 +292,7 @@ export const deleteUser = async (req, res) => {
 
 export const updateMonthlyBudget = async (req, res) => {
   try {
-    if (!req.params || !req.params.userId) {
-      return res
-        .status(400)
-        .json({ status: false, message: "Missing Request Parameters" });
-    }
-    const { userId } = req.params;
+    const userId = req.userId;
 
     if (!userId) {
       return res
@@ -334,7 +330,15 @@ export const updateMonthlyBudget = async (req, res) => {
     res.status(200).json({
       status: true,
       message: "Monthly budget updated successfully",
-      data: updatedUser,
+      data: {
+        user: {
+          name: updatedUser.name,
+          email: updatedUser.email,
+          monthlyBudget: updatedUser.monthlyBudget,
+          currency: updatedUser.currency,
+          createdAt: updatedUser.createdAt,
+        },
+      },
     });
   } catch (error) {
     console.error(

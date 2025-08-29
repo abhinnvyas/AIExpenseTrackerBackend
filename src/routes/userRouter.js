@@ -12,13 +12,11 @@ import {
 
 const router = express.Router();
 
-router.post("/", createUser); // Create user
-router.post("/login", loginUser); // User login
-router.get("/", getUsers); // Get all users
-router.get("/:userId", getUserById); // Get user by ID
-router.get("/budget/:userId", getUserBudget); // Get user budget details
-router.get("/balance/:userId", getAvailableBalance); // Get available balance for a user
-router.put("/budget/:userId", updateMonthlyBudget); // Update budget for a user
-router.delete("/:userId", deleteUser);
+// router.get("/", getUsers); // Get all users
+router.get("/", getUserById); // Get user by ID
+router.get("/budget/", getUserBudget); // Get user budget details
+router.get("/av/balance/", getAvailableBalance); // Get available balance for a user
+router.put("/budget/", updateMonthlyBudget); // Update budget for a user
+router.delete("/", deleteUser);
 
 export default router;
